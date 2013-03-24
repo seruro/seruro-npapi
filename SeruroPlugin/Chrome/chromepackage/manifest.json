@@ -1,0 +1,9 @@
+{
+  "name": "SeruroPlugin",
+  "version": "${FBSTRING_PLUGIN_VERSION}",
+  "description": "A Seruro thin client which implements the simple Seruro API.",
+
+	"plugins": [
+    { "path": "npSeruroPlugin.dll", "public": true }
+  ]
+}

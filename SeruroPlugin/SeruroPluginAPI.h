@@ -44,6 +44,17 @@ public:
         registerProperty("version",
                          make_property(this,
                                        &SeruroPluginAPI::get_version));
+
+		// Begin SERURO additions
+		registerMethod("isReady",	make_method(this, &SeruroPluginAPI::isReady));
+		registerMethod("myAddresses",	make_method(this, &SeruroPluginAPI::myAddresses));
+		// This is a method instead of a property to allow additional checks during
+		// query-time, such as frequency and number (which may indicate a security problem).
+		registerMethod("haveCert",	make_method(this, &SeruroPluginAPI::haveCert));
+		registerMethod("encryptBlob",	make_method(this, &SeruroPluginAPI::encryptBlob));
+		registerMethod("decryptBlob",	make_method(this, &SeruroPluginAPI::decryptBlob));
+
+		registerMethod("apiCall",	make_method(this, &SeruroPluginAPI::apiCall));
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -73,6 +84,16 @@ public:
 
     // Method test-event
     void testEvent();
+
+	// Begin SERURO additions
+	bool isReady();
+	FB::variant myAddresses();
+	bool haveCert(const FB::variant& address);
+	std::string encryptBlob(const FB::variant& address_list, const FB::variant& blob);
+	std::string decryptBlob(const FB::variant& address, const FB::variant& blob);
+
+	void haveCertAPI(FB::VariantMap& request, FB::JSObjectPtr &callback);
+	bool apiCall(FB::VariantMap &request, FB::JSObjectPtr &callback);
 
 private:
     SeruroPluginWeakPtr m_plugin;

@@ -11,6 +11,8 @@
 
 #include "SeruroPluginAPI.h"
 
+#include "boost/thread.hpp"
+
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn FB::variant SeruroPluginAPI::echo(const FB::variant& msg)
 ///
@@ -63,4 +65,52 @@ std::string SeruroPluginAPI::get_version()
 void SeruroPluginAPI::testEvent()
 {
     fire_test();
+}
+
+// Being SERURO functions
+bool SeruroPluginAPI::isReady()
+{
+	return true;
+}
+
+FB::variant SeruroPluginAPI:: myAddresses()
+{
+	FB::variant addr_list("teddy.reed@gmail.com");
+	return addr_list;
+}
+
+bool SeruroPluginAPI::haveCert(const FB::variant& address)
+{
+	return true;
+}
+
+std::string SeruroPluginAPI::encryptBlob(const FB::variant& address_list, const FB::variant& blob)
+{
+	std::string enc_blob("ENCRYPTED");
+	return enc_blob;
+}
+
+std::string SeruroPluginAPI::decryptBlob(const FB::variant& address, const FB::variant& blob)
+{
+	std::string dec_blob("DECRYPTED");
+	return dec_blob;
+}
+
+// Testing flexible API interface
+void SeruroPluginAPI::haveCertAPI(FB::VariantMap& request, FB::JSObjectPtr &callback)
+{
+	FB::variant result(true);
+	callback->InvokeAsync("", FB::variant_list_of(result));
+}
+
+bool SeruroPluginAPI::apiCall(FB::VariantMap &request, FB::JSObjectPtr &callback)
+{
+	if (request["api"].convert_cast<std::string>().compare("haveCert") == 0) {
+		boost::thread api_thread(
+			boost::bind(
+				&SeruroPluginAPI::haveCertAPI, 
+				this, request, callback)
+		);
+	}
+	return true;
 }

@@ -11,6 +11,99 @@
 
 #include "SeruroPlugin.h"
 
+api_dict SeruroPlugin::seruroAPIs;
+bool SeruroPlugin::thickConnected;
+//boost::thread SeruroPlugin::connector;
+
+class SeruroClient
+{
+public:
+	SeruroClient(boost::asio::io_service& io_service, 
+		boost::asio::ip::tcp::resolver::iterator iterator) 
+		: io_service_(io_service), socket_(io_service)
+	{
+		boost::asio::ip::tcp::endpoint endpoint = *iterator;
+		socket_.async_connect(endpoint, boost::bind(&SeruroClient::handleConnect,
+			this, boost::asio::placeholders::error, ++iterator));
+	}
+
+	void write(std::string msg)
+	{
+	}
+
+	void close()
+	{
+		io_service_.post(boost::bind(&SeruroClient::doClose, this));
+	}
+
+private:
+	void handleConnect(const boost::system::error_code& error,
+		boost::asio::ip::tcp::resolver::iterator iterator)
+	{
+		if (!error) {
+			socket_.async_receive(boost::asio::buffer(buffer_.data(), buffer_len_),
+				boost::bind(&SeruroClient::handleReceive, this, boost::asio::placeholders::error)
+			);
+		}
+		else if (iterator != boost::asio::ip::tcp::resolver::iterator())
+		{
+			socket_.close();
+			boost::asio::ip::tcp::endpoint endpoint = *iterator;
+			socket_.async_connect(endpoint,
+				boost::bind(&SeruroClient::handleConnect, this,
+				boost::asio::placeholders::error, ++iterator));
+		}
+	}
+
+	void handleReceive(const boost::system::error_code& error)
+	{
+		if (error == 0) {
+			//std::cout << m_Buffer.data() << std::endl;
+
+			socket_.async_receive(boost::asio::buffer(buffer_.data(), buffer_len_),
+				boost::bind(&SeruroClient::handleReceive, this, boost::asio::placeholders::error));
+		} else {
+			doClose();
+		}
+	}
+
+	void doClose()
+	{
+		socket_.close();
+	}
+
+private:
+	boost::asio::io_service& io_service_;
+	boost::asio::ip::tcp::socket socket_;
+
+	boost::array<char, 128> buffer_;
+	size_t buffer_len_;
+};
+
+void thickConnect()
+{
+    try {
+		boost::asio::io_service io_service;
+
+		boost::asio::ip::tcp::resolver resolver(io_service);
+		boost::asio::ip::tcp::resolver::query query("127.0.0.1", "8433");
+
+		boost::asio::ip::tcp::resolver::iterator iterator = resolver.resolve(query);
+
+		SeruroClient client(io_service, iterator);
+
+		boost::thread client_thread(
+			boost::bind(&boost::asio::io_service::run, &io_service)
+		);
+
+		SeruroPlugin::thickConnected = true;
+		//client.close();
+		//client_thread.join();
+    } catch (std::exception& e) {
+        //std::cerr << e.what() << std::endl;
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn SeruroPlugin::StaticInitialize()
 ///
@@ -22,6 +115,21 @@ void SeruroPlugin::StaticInitialize()
 {
     // Place one-time initialization stuff here; As of FireBreath 1.4 this should only
     // be called once per process
+
+	// Create a list of valid commands.
+	SeruroPlugin::seruroAPIs["haveCert"] = true;
+	SeruroPlugin::seruroAPIs["haveAddress"] = true;
+	SeruroPlugin::seruroAPIs["encryptBlob"] = true;
+	SeruroPlugin::seruroAPIs["decryptBlob"] = true;
+	SeruroPlugin::seruroAPIs["isReady"] = true;
+
+	// Open socket 
+	boost::thread connector(thickConnect);
+}
+
+bool SeruroPlugin::validCall(std::string call)
+{
+	return this->seruroAPIs.count(call) > 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

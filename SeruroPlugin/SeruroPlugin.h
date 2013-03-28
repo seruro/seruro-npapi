@@ -15,13 +15,36 @@
 
 #include "PluginCore.h"
 
+#include <string>
+#include <vector>
+#include <map>
+
+#include "boost/thread.hpp"
+#include <boost/bind.hpp>
+#include <boost/array.hpp>
+#include <boost/asio.hpp>
+
+// Could be a map of API_NAME->ARG_LIST
+typedef std::map<std::string, bool > api_dict;
 
 FB_FORWARD_PTR(SeruroPlugin)
 class SeruroPlugin : public FB::PluginCore
 {
 public:
+	// The initializer should populate the valid API calls.
     static void StaticInitialize();
     static void StaticDeinitialize();
+	// We can call this from the plugin API to check if the command
+	// is valid.
+	bool validCall(std::string call);
+	// Make local connection to thick client listener.
+	//void thickConnect();
+	static bool thickConnected;
+
+private:
+	static api_dict seruroAPIs;
+	//static boost::thread connector;
+
 
 public:
     SeruroPlugin();
@@ -35,7 +58,7 @@ public:
     // If you want your plugin to be optionally windowless based on the
     // value of the "windowless" param tag, remove this method or return
     // FB::PluginCore::isWindowless()
-    virtual bool isWindowless() { return false; }
+    virtual bool isWindowless() { return true; }
 
     BEGIN_PLUGIN_EVENT_MAP()
         EVENTTYPE_CASE(FB::MouseDownEvent, onMouseDown, FB::PluginWindow)

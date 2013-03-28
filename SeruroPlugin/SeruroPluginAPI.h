@@ -31,26 +31,17 @@ public:
     SeruroPluginAPI(const SeruroPluginPtr& plugin, const FB::BrowserHostPtr& host) :
         m_plugin(plugin), m_host(host)
     {
-        registerMethod("echo",      make_method(this, &SeruroPluginAPI::echo));
-        registerMethod("testEvent", make_method(this, &SeruroPluginAPI::testEvent));
-        
-        // Read-write property
-        registerProperty("testString",
-                         make_property(this,
-                                       &SeruroPluginAPI::get_testString,
-                                       &SeruroPluginAPI::set_testString));
-        
         // Read-only property
         registerProperty("version",
                          make_property(this,
                                        &SeruroPluginAPI::get_version));
 
 		// Begin SERURO additions
-		registerMethod("isReady",	make_method(this, &SeruroPluginAPI::isReady));
-		registerMethod("myAddresses",	make_method(this, &SeruroPluginAPI::myAddresses));
+		registerMethod("isReady",		make_method(this, &SeruroPluginAPI::isReady));
+		registerMethod("haveAddress",	make_method(this, &SeruroPluginAPI::haveAddress));
 		// This is a method instead of a property to allow additional checks during
 		// query-time, such as frequency and number (which may indicate a security problem).
-		registerMethod("haveCert",	make_method(this, &SeruroPluginAPI::haveCert));
+		registerMethod("haveCert",		make_method(this, &SeruroPluginAPI::haveCert));
 		registerMethod("encryptBlob",	make_method(this, &SeruroPluginAPI::encryptBlob));
 		registerMethod("decryptBlob",	make_method(this, &SeruroPluginAPI::decryptBlob));
 
@@ -85,17 +76,19 @@ public:
     // Method test-event
     void testEvent();
 
-	// Begin SERURO additions
-	bool isReady();
-	FB::variant myAddresses();
-	bool haveCert(const FB::variant& address);
-	std::string encryptBlob(const FB::variant& address_list, const FB::variant& blob);
-	std::string decryptBlob(const FB::variant& address, const FB::variant& blob);
+	// Begin SERURO API calls, synchron
+	FB::VariantMap isReady(FB::VariantMap);
+	FB::VariantMap haveAddress(FB::VariantMap);
+	FB::VariantMap haveCert(FB::VariantMap);
+	FB::VariantMap encryptBlob(FB::VariantMap);
+	FB::VariantMap decryptBlob(FB::VariantMap);
 
-	void haveCertAPI(FB::VariantMap& request, FB::JSObjectPtr &callback);
+	// Envoke API call, async
 	bool apiCall(FB::VariantMap &request, FB::JSObjectPtr &callback);
 
 private:
+	void apiHandler(FB::VariantMap& request, FB::JSObjectPtr &callback);
+
     SeruroPluginWeakPtr m_plugin;
     FB::BrowserHostPtr m_host;
 

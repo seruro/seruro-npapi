@@ -1,0 +1,4 @@
+== Development ==
+$ git submodule update --init --recursive
+$ ./firebreath/prep<system> ./SeruroPlugin ./build
+

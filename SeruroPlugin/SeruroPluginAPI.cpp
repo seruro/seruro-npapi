@@ -1,32 +1,20 @@
-/**********************************************************\
-
-  Auto-generated SeruroPluginAPI.cpp
-
-\**********************************************************/
+/*
+ * Project: Seruro-NPAPI
+ * File: SeruroPluginAPI.cpp
+ * Description: Fire Breath project code to expose the Seruro API to a web browser.
+ *
+ * All project code (C)2012-2013 Valdrea, LLC. All rights reserved.
+ *
+ */
 
 #include "JSObject.h"
 #include "variant_list.h"
 #include "DOM/Document.h"
 #include "global/config.h"
 
+#include <boost/thread.hpp>
+
 #include "SeruroPluginAPI.h"
-
-#include "boost/thread.hpp"
-
-///////////////////////////////////////////////////////////////////////////////
-/// @fn FB::variant SeruroPluginAPI::echo(const FB::variant& msg)
-///
-/// @brief  Echos whatever is passed from Javascript.
-///         Go ahead and change it. See what happens!
-///////////////////////////////////////////////////////////////////////////////
-FB::variant SeruroPluginAPI::echo(const FB::variant& msg)
-{
-    static int n(0);
-    fire_echo("So far, you clicked this many times: ", n++);
-
-    // return "foobar";
-    return msg;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn SeruroPluginPtr SeruroPluginAPI::getPlugin()
@@ -119,7 +107,7 @@ FB::VariantMap SeruroPluginAPI::decryptBlob(FB::VariantMap params)
 }
 
 // Testing flexible API interface
-void SeruroPluginAPI::apiHandler(FB::VariantMap& request, FB::JSObjectPtr &callback)
+void SeruroPluginAPI::apiHandler(FB::VariantMap request, const FB::JSObjectPtr &callback)
 {
 	FB::VariantMap result;
 	FB::VariantMap params;
@@ -146,11 +134,12 @@ void SeruroPluginAPI::apiHandler(FB::VariantMap& request, FB::JSObjectPtr &callb
 }
 
 // Should be the only method exposed
-bool SeruroPluginAPI::apiCall(FB::VariantMap &request, FB::JSObjectPtr &callback)
+bool SeruroPluginAPI::apiCall(FB::VariantMap request, const FB::JSObjectPtr &callback)
 {
 	// Check to make sure this call is "valid"
+    // FB::VariantMap input = request->convert_cast<FB::VariantMap>();
 	if (request.count("api") == 0 ||
-		! this->getPlugin()->validCall(request["api"].convert_cast<std::string>())) 
+		! this->getPlugin()->validCall(request["api"].convert_cast<std::string>()))
 		return false;
 	// Create an apiHandler thread, to continue evaluation async
 	boost::thread api_thread(

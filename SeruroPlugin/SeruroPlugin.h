@@ -1,11 +1,12 @@
-/**********************************************************\
+/*
+ * Project: Seruro-NPAPI
+ * File: SeruroPlugin.h
+ * Description: Fire Breath project code to expose the Seruro API to a web browser.
+ *
+ * All project code (C)2012-2013 Valdrea, LLC. All rights reserved.
+ *
+ */
 
-  Auto-generated SeruroPlugin.h
-
-  This file contains the auto-generated main plugin object
-  implementation for the SeruroPlugin project
-
-\**********************************************************/
 #ifndef H_SeruroPluginPLUGIN
 #define H_SeruroPluginPLUGIN
 
@@ -18,11 +19,6 @@
 #include <string>
 #include <vector>
 #include <map>
-
-#include "boost/thread.hpp"
-#include <boost/bind.hpp>
-#include <boost/array.hpp>
-#include <boost/asio.hpp>
 
 // Could be a map of API_NAME->ARG_LIST
 typedef std::map<std::string, bool > api_dict;

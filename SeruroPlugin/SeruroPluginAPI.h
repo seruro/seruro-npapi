@@ -1,8 +1,11 @@
-/**********************************************************\
-
-  Auto-generated SeruroPluginAPI.h
-
-\**********************************************************/
+/*
+ * Project: Seruro-NPAPI
+ * File: SeruroPluginAPI.h
+ * Description: Fire Breath project code to expose the Seruro API to a web browser.
+ *
+ * All project code (C)2012-2013 Valdrea, LLC. All rights reserved.
+ *
+ */
 
 #include <string>
 #include <sstream>
@@ -59,24 +62,12 @@ public:
 
     SeruroPluginPtr getPlugin();
 
-    // Read/Write property ${PROPERTY.ident}
-    std::string get_testString();
-    void set_testString(const std::string& val);
 
     // Read-only property ${PROPERTY.ident}
     std::string get_version();
 
-    // Method echo
-    FB::variant echo(const FB::variant& msg);
-    
-    // Event helpers
-    FB_JSAPI_EVENT(test, 0, ());
-    FB_JSAPI_EVENT(echo, 2, (const FB::variant&, const int));
 
-    // Method test-event
-    void testEvent();
-
-	// Begin SERURO API calls, synchron
+	// Begin SERURO API calls, sync
 	FB::VariantMap isReady(FB::VariantMap);
 	FB::VariantMap haveAddress(FB::VariantMap);
 	FB::VariantMap haveCert(FB::VariantMap);
@@ -84,15 +75,13 @@ public:
 	FB::VariantMap decryptBlob(FB::VariantMap);
 
 	// Envoke API call, async
-	bool apiCall(FB::VariantMap &request, FB::JSObjectPtr &callback);
+	bool apiCall(FB::VariantMap request, const FB::JSObjectPtr &callback);
 
 private:
-	void apiHandler(FB::VariantMap& request, FB::JSObjectPtr &callback);
+	void apiHandler(FB::VariantMap request, const FB::JSObjectPtr &callback);
 
     SeruroPluginWeakPtr m_plugin;
     FB::BrowserHostPtr m_host;
-
-    std::string m_testString;
 };
 
 #endif // H_SeruroPluginAPI

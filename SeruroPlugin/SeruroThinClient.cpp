@@ -74,6 +74,6 @@ void thickConnect()
 		//client.close();
 		//client_thread.join();
     } catch (std::exception& e) {
-        //std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << std::endl;
     }
 }

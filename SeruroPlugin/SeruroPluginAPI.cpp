@@ -15,6 +15,8 @@
 #include <boost/thread.hpp>
 
 #include "SeruroPluginAPI.h"
+#include "SeruroProtocol.h"
+#include "SeruroThinClient.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn SeruroPluginPtr SeruroPluginAPI::getPlugin()
